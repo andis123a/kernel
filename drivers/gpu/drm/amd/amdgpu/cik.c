@@ -2723,8 +2723,9 @@ static void gladius_vmid_reset_ps4(struct amdgpu_device *adev)
 
 /*
  * gladius_gb_addr_config_clones_ps4 — Sony FUN_00cae8d0
- * Propagates GB_ADDR_CONFIG ROW_SIZE (bits 28:29) to mirror registers
- * that the hardware clones but does not automatically keep in sync.
+ * Sony computes ROW_SIZE from ASIC type: 0 for Liverpool, 1<<28 for Gladius.
+ * The golden table sets 0x12011003 (ROW=1) for both, but Sony overrides
+ * Liverpool back to ROW=0 at runtime.
  */
 static void gladius_gb_addr_config_clones_ps4(struct amdgpu_device *adev)
 {
@@ -2737,7 +2738,7 @@ static void gladius_gb_addr_config_clones_ps4(struct amdgpu_device *adev)
 	u32 row_size, val;
 	int i;
 
-	row_size = RREG32(mmGB_ADDR_CONFIG) & 0x30000000;
+	row_size = (adev->asic_type == CHIP_GLADIUS) ? 0x10000000 : 0;
 
 	for (i = 0; i < ARRAY_SIZE(clone_regs); i++) {
 		val = RREG32(clone_regs[i]);
