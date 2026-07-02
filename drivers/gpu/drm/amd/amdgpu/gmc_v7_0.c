@@ -487,6 +487,7 @@ static void gmc_v7_0_flush_gpu_tlb(struct amdgpu_device *adev, uint32_t vmid,
 static uint64_t gmc_v7_0_emit_flush_gpu_tlb(struct amdgpu_ring *ring,
 					    unsigned int vmid, uint64_t pd_addr)
 {
+	struct amdgpu_device *adev = ring->adev;
 	uint32_t reg;
 
 	amdgpu_ring_emit_wreg(ring, mmVM_CONTEXTS_DISABLE,
