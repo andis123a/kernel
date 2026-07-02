@@ -476,6 +476,10 @@ static void gmc_v7_0_flush_gpu_tlb_pasid(struct amdgpu_device *adev,
 static void gmc_v7_0_flush_gpu_tlb(struct amdgpu_device *adev, uint32_t vmid,
 					uint32_t vmhub, uint32_t flush_type)
 {
+	u32 tmp = RREG32(mmVM_CONTEXTS_DISABLE);
+	if (tmp & (1 << vmid))
+		WREG32(mmVM_CONTEXTS_DISABLE, tmp & ~(1 << vmid));
+
 	/* bits 0-15 are the VM contexts0-15 */
 	WREG32(mmVM_INVALIDATE_REQUEST, 1 << vmid);
 }
@@ -484,6 +488,9 @@ static uint64_t gmc_v7_0_emit_flush_gpu_tlb(struct amdgpu_ring *ring,
 					    unsigned int vmid, uint64_t pd_addr)
 {
 	uint32_t reg;
+
+	amdgpu_ring_emit_wreg(ring, mmVM_CONTEXTS_DISABLE,
+			      RREG32(mmVM_CONTEXTS_DISABLE) & ~(1 << vmid));
 
 	if (vmid < 8)
 		reg = mmVM_CONTEXT0_PAGE_TABLE_BASE_ADDR + vmid;
@@ -700,6 +707,7 @@ static int gmc_v7_0_gart_enable(struct amdgpu_device *adev)
 			WREG32(mmVM_CONTEXT8_PAGE_TABLE_END_ADDR + i,
 			       adev->vm_manager.max_pfn - 1);
 		}
+		WREG32(mmVM_CONTEXTS_DISABLE, 0);
 	}
 
 	/* enable context1-15 */
