@@ -2730,7 +2730,7 @@ static void gladius_vmid_reset_ps4(struct amdgpu_device *adev)
 static void gladius_gb_addr_config_clones_ps4(struct amdgpu_device *adev)
 {
 	static const u32 clone_regs[] = {
-		0x300, 0x3bd3, 0x3bd4, 0x3bd5, 0x8253,
+		0x300, 0x3bd3, 0x3bd4, 0x3bd5, 0x8252, 0x8253,
 	};
 	static const u32 liverpool_only[] = {
 		0x3992, 0x3993, 0x39c5,
